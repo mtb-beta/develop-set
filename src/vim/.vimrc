@@ -38,7 +38,7 @@ set t_Sf=e[3%dm                     " xterm-256color
 set t_Sb=e[4%dm                     " xterm-256color
 set expandtab                       " change tab into space
 set tabstop=4                       " tab width
-set softtabstop=4                   " tab width
+set softtabstop=0                   " tab width
 set shiftwidth=4                    " tab width
 set shiftround                      " round indent
 set modelines=0                     " line num in :set
@@ -57,7 +57,6 @@ set switchbuf=useopen               " 新しく開く代わりに既に開いて
 set showmatch                       " 対応する括弧などをハイライト表示
 set matchtime=3                     " 対応括弧のハイライト表示を３秒にする
 set wrap                            " 長いテキストの折り返し
-set paste
 
 " ESCを２回押すことでハイライトを消す
 nnoremap <Esc><Esc> :nohlsearch<CR>
