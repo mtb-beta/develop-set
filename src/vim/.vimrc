@@ -9,6 +9,7 @@ syntax on
 " エンコーディング
 set encoding=utf8
 
+set tw=0 " 自動折り返ししない
 setlocal textwidth=80
 set incsearch
 set ignorecase
