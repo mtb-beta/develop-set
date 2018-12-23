@@ -39,7 +39,7 @@ set t_Sf=e[3%dm                     " xterm-256color
 set t_Sb=e[4%dm                     " xterm-256color
 set expandtab                       " change tab into space
 set tabstop=4                       " tab width
-set softtabstop=0                   " tab width
+set softtabstop=4                   " tab width
 set shiftwidth=4                    " tab width
 set shiftround                      " round indent
 set modelines=0                     " line num in :set
