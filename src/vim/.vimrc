@@ -10,7 +10,6 @@ syntax on
 set encoding=utf8
 
 set tw=0 " 自動折り返ししない
-setlocal textwidth=80
 set incsearch
 set ignorecase
 set ruler
@@ -134,4 +133,5 @@ augroup fileTypeIndent
     autocmd!
     autocmd BufNewFile,BufRead *.py setlocal tabstop=4 softtabstop=4 shiftwidth=4
     autocmd BufNewFile,BufRead *.html setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd BufNewFile,BufRead *.css setlocal tabstop=2 softtabstop=2 shiftwidth=2
 augroup END
