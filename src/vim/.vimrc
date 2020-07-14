@@ -140,6 +140,8 @@ augroup END
 call plug#begin('~/.vim/plugged')
 
 Plug 'prabirshrestha/vim-lsp'
+Plug 'scrooloose/syntastic'
+Plug 'psf/black', { 'branch': 'stable' }
 Plug 'prabirshrestha/async.vim'
 
 call plug#end()
@@ -182,3 +184,10 @@ function! s:configure_lsp() abort
 endfunction
 let g:lsp_diagnostics_enabled = 0  " 警告やエラーの表示はALEに任せるのでOFFにする
 
+
+" synstastic用の設定 flake8を有効化する
+let g:syntastic_python_checkers = ["flake8"]
+     
+" black用の設定
+let g:black_linelength = 99
+autocmd BufWritePre *.py execute ':Black'
