@@ -145,11 +145,12 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'scrooloose/syntastic'
 Plug 'psf/black', { 'branch': 'stable' }
 Plug 'prabirshrestha/async.vim'
+Plug 'tpope/vim-pathogen'
 
 call plug#end()
 
-" 参考: https://kashewnuts.github.io/2019/01/28/move_from_jedivim_to_vimlsp.html
 " 言語用Serverの設定
+" 参考にした https://kashewnuts.github.io/2019/01/28/move_from_jedivim_to_vimlsp.html
 augroup MyLsp
   autocmd!
   " pip install python-language-server
@@ -186,10 +187,12 @@ function! s:configure_lsp() abort
 endfunction
 let g:lsp_diagnostics_enabled = 0  " 警告やエラーの表示はALEに任せるのでOFFにする
 
-
 " synstastic用の設定 flake8を有効化する
 let g:syntastic_python_checkers = ["flake8"]
-     
+
 " black用の設定
 let g:black_linelength = 99
 autocmd BufWritePre *.py execute ':Black'
+
+" CoffeeScriptのシンタックス
+execute pathogen#infect()
