@@ -146,6 +146,9 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'psf/black', { 'branch': 'stable' }
 Plug 'prabirshrestha/async.vim'
 Plug 'mattn/emmet-vim'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
+
 
 call plug#end()
 
