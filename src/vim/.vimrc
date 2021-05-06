@@ -136,6 +136,7 @@ augroup fileTypeIndent
     autocmd BufNewFile,BufRead *.css setlocal tabstop=2 softtabstop=2 shiftwidth=2
     autocmd BufNewFile,BufRead *.js setlocal tabstop=2 softtabstop=2 shiftwidth=2
     autocmd BufNewFile,BufRead *.jsx setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd BufNewFile,BufRead *.vue setlocal tabstop=2 softtabstop=2 shiftwidth=2
 augroup END
 
 " vim-plug
@@ -145,7 +146,10 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'scrooloose/syntastic'
 Plug 'psf/black', { 'branch': 'stable' }
 Plug 'prabirshrestha/async.vim'
+Plug 'mattn/emmet-vim'
 Plug 'tpope/vim-pathogen'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
 
 call plug#end()
 
@@ -196,3 +200,20 @@ autocmd BufWritePre *.py execute ':Black'
 
 " CoffeeScriptのシンタックス
 execute pathogen#infect()
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+" Python/black用の設定
+let g:black_linelength = 99
+autocmd BufWritePre *.py execute ':Black'
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+" vim-emmetの設定
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
