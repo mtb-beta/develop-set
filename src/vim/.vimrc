@@ -218,4 +218,4 @@ set statusline+=%*
 
 " vim-emmetの設定
 let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
+autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
