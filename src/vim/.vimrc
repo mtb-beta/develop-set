@@ -139,23 +139,29 @@ augroup fileTypeIndent
     autocmd BufNewFile,BufRead *.tsx setlocal tabstop=2 softtabstop=2 shiftwidth=2
     autocmd BufNewFile,BufRead *.ts setlocal tabstop=2 softtabstop=2 shiftwidth=2
     autocmd BufNewFile,BufRead *.vue setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd BufNewFile,BufRead *.prisma setlocal tabstop=2 softtabstop=2 shiftwidth=2
 augroup END
 
 " vim-plug
 call plug#begin('~/.vim/plugged')
 
 Plug 'prabirshrestha/vim-lsp'
-" Plug 'scrooloose/syntastic'
+"Plug 'scrooloose/syntastic'
 Plug 'psf/black', { 'branch': 'stable' }
 Plug 'prabirshrestha/async.vim'
 Plug 'mattn/emmet-vim'
 Plug 'tpope/vim-pathogen'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
+Plug 'hashivim/vim-terraform'
 
 " for TypeScript
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 Plug 'Quramy/tsuquyomi'
+Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
+
+" for Prisma
+Plug 'pantharshit00/vim-prisma'
 
 call plug#end()
 
