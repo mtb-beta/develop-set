@@ -225,3 +225,7 @@ set statusline+=%*
 " vim-emmetの設定
 let g:user_emmet_install_global = 0
 autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
+
+
+" terraformによる保存時の自動フォーマット
+let g:terraform_fmt_on_save = 1
