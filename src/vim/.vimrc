@@ -222,6 +222,10 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
+" vim-prettier
+autocmd BufWritePre *.ts execute ':Prettier'
+autocmd BufWritePre *.tsx execute ':Prettier'
+
 " vim-emmetの設定
 let g:user_emmet_install_global = 0
 autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
