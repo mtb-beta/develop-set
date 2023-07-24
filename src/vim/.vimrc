@@ -1,39 +1,22 @@
-" マウスを使えるようにする
 if has("mouse")
   set mouse=a
 end
 
-" シンタックスハイライトを有効化
 syntax on
-
-" エンコーディング
 set encoding=utf8
-
-set tw=0 " 自動折り返ししない
 set incsearch
 set ignorecase
 set ruler
 set wildmenu
 set commentstring=\ #\ %s
 set foldlevel=0
-
-" 検索マッチテキストをハイライト
 set hlsearch
-
-" 検索文字に大文字がある場合は大文字小文字を区別
 set smartcase
-
-" Swap/Backupファイルを無効化
 set nowritebackup
 set nobackup
 set noswapfile
-
-" read/write a .viminfo file, don't store more than
 set viminfo=!,'50,<1000,s100,\"50
-
-" keep 100 lines of command line history
 set history=100
-
 set t_Sf=e[3%dm                     " xterm-256color
 set t_Sb=e[4%dm                     " xterm-256color
 set expandtab                       " change tab into space
@@ -42,6 +25,7 @@ set softtabstop=4                   " tab width
 set shiftwidth=4                    " tab width
 set shiftround                      " round indent
 set modelines=0                     " line num in :set
+set nomodeline
 set number                          " show line num
 set autoindent                      " auto indent
 set clipboard+=unnamed              " clipboard <=> yank
@@ -57,6 +41,8 @@ set switchbuf=useopen               " 新しく開く代わりに既に開いて
 set showmatch                       " 対応する括弧などをハイライト表示
 set matchtime=3                     " 対応括弧のハイライト表示を３秒にする
 set wrap                            " 長いテキストの折り返し
+set backspace=indent,eol,start
+set foldlevel=0
 
 " ESCを２回押すことでハイライトを消す
 nnoremap <Esc><Esc> :nohlsearch<CR>
@@ -64,19 +50,12 @@ nnoremap <Esc><Esc> :nohlsearch<CR>
 " 対応括弧に'<'と'>'のペアを追加
 set matchpairs& matchpairs+=<:>
 
-" バックスペースで何でも消せるようにする
-set backspace=indent,eol,start
-
 " クリップボードをデフォルトのレジスタとして指定。後にYankRingを使うので
-" 'unnamedplus'が存在しているかどうか
 if has('unnamedplus')
-    " set clipboard& clipboard+=unnamedplus " 2013-07-03 14:30 unnamed 追加
-        set clipboard& clipboard+=unnamedplus,unnamed 
+    set clipboard& clipboard+=unnamedplus,unnamed 
 else
-    " set clipboard& clipboard+=unnamed,autoselect 2013-06-24 10:00 autoselect 削除
     set clipboard& clipboard+=unnamed
 endif
-
 
 " バックスラッシュらクエスチョンを状況に合わせ自動的にエスケープ
 cnoremap <expr> / getcmdtype() == '/' ? '\/' : '/'
@@ -148,17 +127,30 @@ augroup END
 " vim-plug Automatic installation
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " vim-plug
-call plug#begin('~/.vim/plugged')
+if has('vim')
+    " Vimの場合
+    call plug#begin('~/.vim/plugged')
+else
+    " Neovimの場合
+    call plug#begin('~/.local/share/nvim/plugged')
+endif
 
-Plug 'prabirshrestha/vim-lsp'
-"Plug 'scrooloose/syntastic'
+" NeoVimではcoc.nvim, Vimではvim-lsp
+if has('vim')
+    Plug 'prabirshrestha/vim-lsp'
+    Plug 'prabirshrestha/async.vim'
+else
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'github/copilot.vim'
+endif
+
+Plug 'scrooloose/syntastic'
 Plug 'psf/black', { 'branch': 'stable' }
-Plug 'prabirshrestha/async.vim'
 Plug 'mattn/emmet-vim'
 Plug 'tpope/vim-pathogen'
 Plug 'tpope/vim-fugitive'
@@ -173,48 +165,79 @@ Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'type
 " for Prisma
 Plug 'pantharshit00/vim-prisma'
 
+
+
 call plug#end()
 
 " 言語用Serverの設定
-" 参考にした https://kashewnuts.github.io/2019/01/28/move_from_jedivim_to_vimlsp.html
-augroup MyLsp
-  autocmd!
-  " pip install python-language-server
-  if executable('pyls')
-    " Python用の設定を記載
-    " workspace_configで以下の設定を記載
-    " - pycodestyleの設定はALEと重複するので無効にする
-    " - jediの定義ジャンプで一部無効になっている設定を有効化
-    autocmd User lsp_setup call lsp#register_server({
-        \ 'name': 'pyls',
-        \ 'cmd': { server_info -> ['pyls'] },
-        \ 'whitelist': ['python'],
-        \ 'workspace_config': {'pyls': {'plugins': {
-        \   'pycodestyle': {'enabled': v:false},
-        \   'jedi_definition': {'follow_imports': v:true, 'follow_builtin_imports': v:true},}}}
-        \})
-    autocmd FileType python call s:configure_lsp()
-  endif
-augroup END
-" 言語ごとにServerが実行されたらする設定を関数化
-function! s:configure_lsp() abort
-  setlocal omnifunc=lsp#complete   " オムニ補完を有効化
-  " LSP用にマッピング
-  nnoremap <buffer> <C-]> :<C-u>LspDefinition<CR>
-  nnoremap <buffer> gd :<C-u>LspDefinition<CR>
-  nnoremap <buffer> gD :<C-u>LspReferences<CR>
-  nnoremap <buffer> gs :<C-u>LspDocumentSymbol<CR>
-  nnoremap <buffer> gS :<C-u>LspWorkspaceSymbol<CR>
-  nnoremap <buffer> gQ :<C-u>LspDocumentFormat<CR>
-  vnoremap <buffer> gQ :LspDocumentRangeFormat<CR>
-  nnoremap <buffer> K :<C-u>LspHover<CR>
-  nnoremap <buffer> <F1> :<C-u>LspImplementation<CR>
-  nnoremap <buffer> <F2> :<C-u>LspRename<CR>
-endfunction
-let g:lsp_diagnostics_enabled = 0  " 警告やエラーの表示はALEに任せるのでOFFにする
+" vimの場合は、vim-lsp
+if has('vim')
+    " 参考にした https://kashewnuts.github.io/2019/01/28/move_from_jedivim_to_vimlsp.html
+    augroup MyLsp
+    autocmd!
+    " pip install python-language-server
+    if executable('pyls')
+        " Python用の設定を記載
+        " workspace_configで以下の設定を記載
+        " - pycodestyleの設定はALEと重複するので無効にする
+        " - jediの定義ジャンプで一部無効になっている設定を有効化
+        autocmd User lsp_setup call lsp#register_server({
+            \ 'name': 'pyls',
+            \ 'cmd': { server_info -> ['pyls'] },
+            \ 'whitelist': ['python'],
+            \ 'workspace_config': {'pyls': {'plugins': {
+            \   'pycodestyle': {'enabled': v:false},
+            \   'jedi_definition': {'follow_imports': v:true, 'follow_builtin_imports': v:true},}}}
+            \})
+        autocmd FileType python call s:configure_lsp()
+    endif
+    augroup END
+    " 言語ごとにServerが実行されたらする設定を関数化
+    function! s:configure_lsp() abort
+    setlocal omnifunc=lsp#complete   " オムニ補完を有効化
+    " LSP用にマッピング
+    nnoremap <buffer> <C-]> :<C-u>LspDefinition<CR>
+    nnoremap <buffer> gd :<C-u>LspDefinition<CR>
+    nnoremap <buffer> gD :<C-u>LspReferences<CR>
+    nnoremap <buffer> gs :<C-u>LspDocumentSymbol<CR>
+    nnoremap <buffer> gS :<C-u>LspWorkspaceSymbol<CR>
+    nnoremap <buffer> gQ :<C-u>LspDocumentFormat<CR>
+    vnoremap <buffer> gQ :LspDocumentRangeFormat<CR>
+    nnoremap <buffer> K :<C-u>LspHover<CR>
+    nnoremap <buffer> <F1> :<C-u>LspImplementation<CR>
+    nnoremap <buffer> <F2> :<C-u>LspRename<CR>
+    endfunction
+    let g:lsp_diagnostics_enabled = 0  " 警告やエラーの表示はALEに任せるのでOFFにする
+else
+    " Configure coc.nvim plugin
+    let g:coc_global_extensions = ['coc-tsserver', 'coc-python', 'coc-html', 'coc-json']
 
-" synstastic用の設定 flake8を有効化する
-let g:syntastic_python_checkers = ["flake8"]
+    " Configure mappings
+    nmap <silent> gd <Plug>(coc-definition)
+    nmap <silent> gy <Plug>(coc-type-definition)
+    nmap <silent> gi <Plug>(coc-implementation)
+    nmap <silent> gr <Plug>(coc-references)
+    nmap <silent> K  <Plug>(coc-hover)
+
+    " Use <Tab> and <S-Tab> to navigate through popup menu
+    inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+endif
+
+
+
+" synstastic用の設定
+let flake8_repos = []
+for repo in flake8_repos
+    execute 'autocmd BufRead,BufNewFile ' . repo . '* let g:syntastic_python_checkers = ["flake8"]'
+endfor
+" synstastic用の設定
+let pflake8_repos = []
+for repo in flake8_repos
+    execute 'autocmd BufRead,BufNewFile ' . repo . '* let g:syntastic_python_checkers = ["pflake8"]'
+endfor
+
+let g:syntastic_html_checkers = [] " htmlのチェッカーを無効化する
 
 " CoffeeScriptのシンタックス
 execute pathogen#infect()
@@ -240,7 +263,6 @@ autocmd BufWritePre *.js execute ':Prettier'
 " vim-emmetの設定
 let g:user_emmet_install_global = 0
 autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
-
 
 " terraformによる保存時の自動フォーマット
 let g:terraform_fmt_on_save = 1
