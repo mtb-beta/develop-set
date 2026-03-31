@@ -136,7 +136,7 @@ endif
 
 
 " vim-plug
-if has('vim')
+if !has('nvim')
     " Vimの場合
     call plug#begin('~/.vim/plugged')
 else
@@ -145,7 +145,7 @@ else
 endif
 
 " NeoVimではcoc.nvim, Vimではvim-lsp
-if has('vim')
+if !has('nvim')
     Plug 'prabirshrestha/vim-lsp'
     Plug 'prabirshrestha/async.vim'
 else
@@ -173,7 +173,7 @@ call plug#end()
 
 " 言語用Serverの設定
 " vimの場合は、vim-lsp
-if has('vim')
+if !has('nvim')
     " 参考にした https://kashewnuts.github.io/2019/01/28/move_from_jedivim_to_vimlsp.html
     augroup MyLsp
     autocmd!
