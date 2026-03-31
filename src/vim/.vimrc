@@ -1,3 +1,6 @@
+" =============================================================================
+" 1. 基本設定
+" =============================================================================
 if has("mouse")
   set mouse=a
 endif
@@ -6,72 +9,73 @@ syntax on
 set encoding=utf8
 set incsearch
 set ignorecase
+set smartcase
 set ruler
 set wildmenu
 set commentstring=\ #\ %s
 set foldlevel=0
 set hlsearch
-set smartcase
 set nowritebackup
 set nobackup
 set noswapfile
 set viminfo=!,'50,<1000,s100,\"50
 set history=100
-set expandtab                       " change tab into space
-set tabstop=4                       " tab width
-set softtabstop=4                   " tab width
-set shiftwidth=4                    " tab width
-set shiftround                      " round indent
+set expandtab
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set shiftround
 set nomodeline
-set number                          " show line num
-set autoindent                      " auto indent
-set list                            " highlight space/tab at the end of line
-set listchars=tab:^\ ,trail:~       " highlight space/tab at the end of line
-set visualbell t_vb=                " kill beep flash
-set t_vb=                           " kill beep sound
-set novisualbell                    " ベルの削除
-set infercase                       " 補完時に大文字小文字を区別しない
-set virtualedit=all                 " カーソルを文字が存在しない部分でも動けるようにする
-set hidden                          " バッファを閉じる代わりに隠す（Undo履歴を残すために）
-set switchbuf=useopen               " 新しく開く代わりに既に開いてあるバッファを開く
-set showmatch                       " 対応する括弧などをハイライト表示
-set matchtime=3                     " 対応括弧のハイライト表示を３秒にする
-set wrap                            " 長いテキストの折り返し
-set backspace=indent,eol,start
-set fileformat=unix                 " デフォルトでUnix形式（LF）を使用
-set fileformats=unix,dos,mac        " 新規ファイルのデフォルト改行コードを指定
-
-" ESCを２回押すことでハイライトを消す
-nnoremap <Esc><Esc> :nohlsearch<CR>
-
-" 対応括弧に'<'と'>'のペアを追加
+set number
+set autoindent
+set list
+set listchars=tab:^\ ,trail:~
+set visualbell t_vb=
+set t_vb=
+set novisualbell
+set infercase
+set virtualedit=all
+set hidden
+set switchbuf=useopen
+set showmatch
+set matchtime=3
 set matchpairs& matchpairs+=<:>
+set wrap
+set backspace=indent,eol,start
+set fileformat=unix
+set fileformats=unix,dos,mac
 
 " クリップボードをデフォルトのレジスタとして指定
 if has('unnamedplus')
-    set clipboard& clipboard+=unnamedplus,unnamed 
+    set clipboard& clipboard+=unnamedplus,unnamed
 else
     set clipboard& clipboard+=unnamed
 endif
 
-" バックスラッシュらクエスチョンを状況に合わせ自動的にエスケープ
+" =============================================================================
+" 2. キーマップ
+" =============================================================================
+" ESCを２回押すことでハイライトを消す
+nnoremap <Esc><Esc> :nohlsearch<CR>
+
+" バックスラッシュやクエスチョンを状況に合わせ自動的にエスケープ
 cnoremap <expr> / getcmdtype() == '/' ? '\/' : '/'
 cnoremap <expr> ? getcmdtype() == '?' ? '\?' : '?'
 
-
-" see :https://qiita.com/wadako111/items/755e753677dd72d8036d
-" Anywhere SID.
+" =============================================================================
+" 3. タブUI
+" =============================================================================
+" see: https://qiita.com/wadako111/items/755e753677dd72d8036d
 function! s:SID_PREFIX()
   return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
 endfunction
 
-" Set tabline.
 function! s:my_tabline()  "{{{
   let s = ''
   for i in range(1, tabpagenr('$'))
     let bufnrs = tabpagebuflist(i)
-    let bufnr = bufnrs[tabpagewinnr(i) - 1]  " first window, first appears
-    let no = i  " display 0-origin tabpagenr.
+    let bufnr = bufnrs[tabpagewinnr(i) - 1]
+    let no = i
     let mod = getbufvar(bufnr, '&modified') ? '!' : ' '
     let title = fnamemodify(bufname(bufnr), ':t')
     let title = '[' . title . ']'
@@ -85,81 +89,78 @@ function! s:my_tabline()  "{{{
   return s
 endfunction "}}}
 let &tabline = '%!'. s:SID_PREFIX() . 'my_tabline()'
-set showtabline=2 " 常にタブラインを表示
+set showtabline=2
 
-" The prefix key.
 nnoremap [Tag]   <Nop>
 nmap t [Tag]
-" Tab jump
 for n in range(1, 9)
   execute 'nnoremap <silent> [Tag]'.n  ':<C-u>tabnext'.n.'<CR>'
 endfor
-" t1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
 
 map <silent> [Tag]c :tablast <bar> tabnew<CR>
-" tc 新しいタブを一番右に作る
 map <silent> [Tag]x :tabclose<CR>
-" tx タブを閉じる
 map <silent> [Tag]n :tabnext<CR>
-" tn 次のタブ
 map <silent> [Tag]p :tabprevious<CR>
-" tp 前のタブ
-
-" ショートカット
 ca tn tabnew
 
+" =============================================================================
+" 4. ファイルタイプ別設定
+" =============================================================================
 augroup fileTypeIndent
     autocmd!
     autocmd BufNewFile,BufRead *.py setlocal tabstop=4 softtabstop=4 shiftwidth=4
-    autocmd BufNewFile,BufRead *.html,*.css,*.js,*.jsx,*.ts,*.tsx,*.vue,*.prisma setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd BufNewFile,BufRead *.html,*.css,*.js,*.jsx,*.ts,*.tsx,*.vue setlocal tabstop=2 softtabstop=2 shiftwidth=2
 augroup END
 
-" vim-plug Automatic installation
-let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+" =============================================================================
+" 5. プラグイン
+" =============================================================================
+" vim-plug 自動インストール
+let data_dir = '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
     silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+call plug#begin('~/.vim/plugged')
 
-" vim-plug
-if !has('nvim')
-    " Vimの場合
-    call plug#begin('~/.vim/plugged')
-else
-    " Neovimの場合
-    call plug#begin('~/.local/share/nvim/plugged')
-endif
+" LSP
+Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/async.vim'
 
-" NeoVimではcoc.nvim, Vimではvim-lsp
-if !has('nvim')
-    Plug 'prabirshrestha/vim-lsp'
-    Plug 'prabirshrestha/async.vim'
-else
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    " Plug 'github/copilot.vim'
-endif
-
-Plug 'mattn/emmet-vim'
+" Git
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
+
+" フォーマッター
+Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
 Plug 'hashivim/vim-terraform'
 
-Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
+" HTML/CSS
+Plug 'mattn/emmet-vim'
 
 call plug#end()
 
-" 言語用Serverの設定
-" vimの場合は、vim-lsp
-if !has('nvim')
-    " 参考にした https://kashewnuts.github.io/2019/01/28/move_from_jedivim_to_vimlsp.html
-    augroup MyLsp
+" --- vim-prettier ---
+let g:prettier#autoformat = 1
+let g:prettier#autoformat_require_pragma = 0
+
+" --- vim-terraform ---
+let g:terraform_fmt_on_save = 1
+
+" --- emmet ---
+let g:user_emmet_install_global = 0
+augroup MyEmmet
     autocmd!
-    " pip install python-language-server
+    autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
+augroup END
+
+" =============================================================================
+" 6. LSP設定
+" =============================================================================
+augroup MyLsp
+    autocmd!
     if executable('pyls')
-        " Python用の設定を記載
-        " workspace_configで以下の設定を記載
-        " - jediの定義ジャンプで一部無効になっている設定を有効化
         autocmd User lsp_setup call lsp#register_server({
             \ 'name': 'pyls',
             \ 'cmd': { server_info -> ['pyls'] },
@@ -169,11 +170,10 @@ if !has('nvim')
             \})
         autocmd FileType python call s:configure_lsp()
     endif
-    augroup END
-    " 言語ごとにServerが実行されたらする設定を関数化
-    function! s:configure_lsp() abort
-    setlocal omnifunc=lsp#complete   " オムニ補完を有効化
-    " LSP用にマッピング
+augroup END
+
+function! s:configure_lsp() abort
+    setlocal omnifunc=lsp#complete
     nnoremap <buffer> <C-]> :<C-u>LspDefinition<CR>
     nnoremap <buffer> gd :<C-u>LspDefinition<CR>
     nnoremap <buffer> gD :<C-u>LspReferences<CR>
@@ -184,35 +184,6 @@ if !has('nvim')
     nnoremap <buffer> K :<C-u>LspHover<CR>
     nnoremap <buffer> <F1> :<C-u>LspImplementation<CR>
     nnoremap <buffer> <F2> :<C-u>LspRename<CR>
-    endfunction
-    let g:lsp_diagnostics_enabled = 1
-else
-    " Configure coc.nvim plugin
-    let g:coc_global_extensions = ['coc-tsserver', 'coc-pyright', 'coc-html', 'coc-json']
+endfunction
 
-    " Configure mappings
-    nmap <silent> gd <Plug>(coc-definition)
-    nmap <silent> gy <Plug>(coc-type-definition)
-    nmap <silent> gi <Plug>(coc-implementation)
-    nmap <silent> gr <Plug>(coc-references)
-    nmap <silent> K  <Plug>(coc-hover)
-
-    " Use <Tab> and <S-Tab> to navigate through popup menu
-    inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-endif
-
-" vim-prettier
-let g:prettier#autoformat = 1
-let g:prettier#autoformat_require_pragma = 0
-
-" vim-emmetの設定
-let g:user_emmet_install_global = 0
-augroup MyEmmet
-    autocmd!
-    autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
-augroup END
-
-" terraformによる保存時の自動フォーマット
-let g:terraform_fmt_on_save = 1
-
+let g:lsp_diagnostics_enabled = 1
