@@ -1,6 +1,6 @@
 if has("mouse")
   set mouse=a
-end
+endif
 
 syntax on
 set encoding=utf8
@@ -28,7 +28,6 @@ set modelines=0                     " line num in :set
 set nomodeline
 set number                          " show line num
 set autoindent                      " auto indent
-set clipboard+=unnamed              " clipboard <=> yank
 set list                            " highlight space/tab at the end of line
 set listchars=tab:^\ ,trail:~       " highlight space/tab at the end of line
 set visualbell t_vb=                " kill beep flash
@@ -42,7 +41,6 @@ set showmatch                       " 対応する括弧などをハイライト
 set matchtime=3                     " 対応括弧のハイライト表示を３秒にする
 set wrap                            " 長いテキストの折り返し
 set backspace=indent,eol,start
-set foldlevel=0
 set fileformat=unix                 " デフォルトでUnix形式（LF）を使用
 set fileformats=unix,dos,mac        " 新規ファイルのデフォルト改行コードを指定
 
@@ -52,7 +50,7 @@ nnoremap <Esc><Esc> :nohlsearch<CR>
 " 対応括弧に'<'と'>'のペアを追加
 set matchpairs& matchpairs+=<:>
 
-" クリップボードをデフォルトのレジスタとして指定。後にYankRingを使うので
+" クリップボードをデフォルトのレジスタとして指定
 if has('unnamedplus')
     set clipboard& clipboard+=unnamedplus,unnamed 
 else
@@ -156,7 +154,6 @@ endif
 Plug 'scrooloose/syntastic'
 Plug 'psf/black', { 'branch': 'stable' }
 Plug 'mattn/emmet-vim'
-Plug 'tpope/vim-pathogen'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 Plug 'hashivim/vim-terraform'
@@ -207,7 +204,7 @@ if !has('nvim')
     nnoremap <buffer> <F1> :<C-u>LspImplementation<CR>
     nnoremap <buffer> <F2> :<C-u>LspRename<CR>
     endfunction
-    let g:lsp_diagnostics_enabled = 0  " 警告やエラーの表示はALEに任せるのでOFFにする
+    let g:lsp_diagnostics_enabled = 1
 else
     " Configure coc.nvim plugin
     let g:coc_global_extensions = ['coc-tsserver', 'coc-pyright', 'coc-html', 'coc-json']
@@ -226,24 +223,9 @@ endif
 
 
 
-" synstastic用の設定
-let flake8_repos = []
-for repo in flake8_repos
-    execute 'autocmd BufRead,BufNewFile ' . repo . '* let g:syntastic_python_checkers = ["flake8"]'
-endfor
-" synstastic用の設定
-let pflake8_repos = []
-for repo in flake8_repos
-    execute 'autocmd BufRead,BufNewFile ' . repo . '* let g:syntastic_python_checkers = ["pflake8"]'
-endfor
-
-" 一回動作確認
 let g:syntastic_python_checkers = []
 
 let g:syntastic_html_checkers = [] " htmlのチェッカーを無効化する
-
-" CoffeeScriptのシンタックス
-execute pathogen#infect()
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
