@@ -43,6 +43,8 @@ set matchtime=3                     " 対応括弧のハイライト表示を３
 set wrap                            " 長いテキストの折り返し
 set backspace=indent,eol,start
 set foldlevel=0
+set fileformat=unix                 " デフォルトでUnix形式（LF）を使用
+set fileformats=unix,dos,mac        " 新規ファイルのデフォルト改行コードを指定
 
 " ESCを２回押すことでハイライトを消す
 nnoremap <Esc><Esc> :nohlsearch<CR>
@@ -122,6 +124,7 @@ augroup fileTypeIndent
     autocmd BufNewFile,BufRead *.ts setlocal tabstop=2 softtabstop=2 shiftwidth=2
     autocmd BufNewFile,BufRead *.vue setlocal tabstop=2 softtabstop=2 shiftwidth=2
     autocmd BufNewFile,BufRead *.prisma setlocal tabstop=2 softtabstop=2 shiftwidth=2
+
 augroup END
 
 " vim-plug Automatic installation
@@ -130,6 +133,7 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
     silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
+
 
 " vim-plug
 if has('vim')
@@ -146,7 +150,7 @@ if has('vim')
     Plug 'prabirshrestha/async.vim'
 else
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    Plug 'github/copilot.vim'
+    " Plug 'github/copilot.vim'
 endif
 
 Plug 'scrooloose/syntastic'
@@ -165,8 +169,6 @@ Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'type
 " for Prisma
 Plug 'pantharshit00/vim-prisma'
 
-
-
 call plug#end()
 
 " 言語用Serverの設定
@@ -179,14 +181,12 @@ if has('vim')
     if executable('pyls')
         " Python用の設定を記載
         " workspace_configで以下の設定を記載
-        " - pycodestyleの設定はALEと重複するので無効にする
         " - jediの定義ジャンプで一部無効になっている設定を有効化
         autocmd User lsp_setup call lsp#register_server({
             \ 'name': 'pyls',
             \ 'cmd': { server_info -> ['pyls'] },
             \ 'whitelist': ['python'],
             \ 'workspace_config': {'pyls': {'plugins': {
-            \   'pycodestyle': {'enabled': v:false},
             \   'jedi_definition': {'follow_imports': v:true, 'follow_builtin_imports': v:true},}}}
             \})
         autocmd FileType python call s:configure_lsp()
@@ -210,7 +210,7 @@ if has('vim')
     let g:lsp_diagnostics_enabled = 0  " 警告やエラーの表示はALEに任せるのでOFFにする
 else
     " Configure coc.nvim plugin
-    let g:coc_global_extensions = ['coc-tsserver', 'coc-python', 'coc-html', 'coc-json']
+    let g:coc_global_extensions = ['coc-tsserver', 'coc-pyright', 'coc-html', 'coc-json']
 
     " Configure mappings
     nmap <silent> gd <Plug>(coc-definition)
@@ -237,6 +237,9 @@ for repo in flake8_repos
     execute 'autocmd BufRead,BufNewFile ' . repo . '* let g:syntastic_python_checkers = ["pflake8"]'
 endfor
 
+" 一回動作確認
+let g:syntastic_python_checkers = []
+
 let g:syntastic_html_checkers = [] " htmlのチェッカーを無効化する
 
 " CoffeeScriptのシンタックス
@@ -249,7 +252,7 @@ let g:syntastic_check_on_wq = 0
 
 " Python/black用の設定
 let g:black_linelength = 99
-autocmd BufWritePre *.py execute ':Black'
+" autocmd BufWritePre *.py execute ':Black'
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
@@ -266,3 +269,4 @@ autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
 
 " terraformによる保存時の自動フォーマット
 let g:terraform_fmt_on_save = 1
+
