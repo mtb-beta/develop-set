@@ -17,14 +17,11 @@ set nobackup
 set noswapfile
 set viminfo=!,'50,<1000,s100,\"50
 set history=100
-set t_Sf=e[3%dm                     " xterm-256color
-set t_Sb=e[4%dm                     " xterm-256color
 set expandtab                       " change tab into space
 set tabstop=4                       " tab width
 set softtabstop=4                   " tab width
 set shiftwidth=4                    " tab width
 set shiftround                      " round indent
-set modelines=0                     " line num in :set
 set nomodeline
 set number                          " show line num
 set autoindent                      " auto indent
@@ -150,9 +147,6 @@ Plug 'hashivim/vim-terraform'
 
 Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
 
-" for Prisma
-Plug 'pantharshit00/vim-prisma'
-
 call plug#end()
 
 " 言語用Serverの設定
@@ -209,13 +203,15 @@ else
 endif
 
 " vim-prettier
-autocmd BufWritePre *.ts execute ':Prettier'
-autocmd BufWritePre *.tsx execute ':Prettier'
-autocmd BufWritePre *.js execute ':Prettier'
+let g:prettier#autoformat = 1
+let g:prettier#autoformat_require_pragma = 0
 
 " vim-emmetの設定
 let g:user_emmet_install_global = 0
-autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
+augroup MyEmmet
+    autocmd!
+    autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
+augroup END
 
 " terraformによる保存時の自動フォーマット
 let g:terraform_fmt_on_save = 1
