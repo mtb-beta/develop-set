@@ -109,7 +109,7 @@ ca tn tabnew
 augroup fileTypeIndent
     autocmd!
     autocmd BufNewFile,BufRead *.py setlocal tabstop=4 softtabstop=4 shiftwidth=4
-    autocmd BufNewFile,BufRead *.html,*.css,*.js,*.jsx,*.ts,*.tsx,*.vue setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd BufNewFile,BufRead *.html,*.css,*.js,*.jsx,*.ts,*.tsx,*.yaml,*.yml,*.toml setlocal tabstop=2 softtabstop=2 shiftwidth=2
 augroup END
 
 " =============================================================================
@@ -132,50 +132,44 @@ Plug 'prabirshrestha/async.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
-" フォーマッター
-Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
-Plug 'hashivim/vim-terraform'
-
-" HTML/CSS
-Plug 'mattn/emmet-vim'
-
 call plug#end()
-
-" --- vim-prettier ---
-let g:prettier#autoformat = 1
-let g:prettier#autoformat_require_pragma = 0
-
-" --- vim-terraform ---
-let g:terraform_fmt_on_save = 1
-
-" --- emmet ---
-let g:user_emmet_install_global = 0
-augroup MyEmmet
-    autocmd!
-    autocmd FileType html,css,javascript,javascript.jsx EmmetInstall
-augroup END
 
 " =============================================================================
 " 6. LSP設定
 " =============================================================================
 augroup MyLsp
     autocmd!
-    if executable('pyls')
+    " pylsp: 補完・定義ジャンプ（pip install python-lsp-server）
+    if executable('pylsp')
         autocmd User lsp_setup call lsp#register_server({
-            \ 'name': 'pyls',
-            \ 'cmd': { server_info -> ['pyls'] },
-            \ 'whitelist': ['python'],
-            \ 'workspace_config': {'pyls': {'plugins': {
-            \   'jedi_definition': {'follow_imports': v:true, 'follow_builtin_imports': v:true},}}}
+            \ 'name': 'pylsp',
+            \ 'cmd': { server_info -> ['pylsp'] },
+            \ 'allowlist': ['python'],
+            \ 'workspace_config': {'pylsp': {'plugins': {
+            \   'jedi_definition': {'follow_imports': v:true, 'follow_builtin_imports': v:true},
+            \   'pyflakes': {'enabled': v:false},
+            \   'pycodestyle': {'enabled': v:false},
+            \   'mccabe': {'enabled': v:false},
+            \   'autopep8': {'enabled': v:false},
+            \   'yapf': {'enabled': v:false},
+            \   }}}
             \})
-        autocmd FileType python call s:configure_lsp()
     endif
+    " ruff: リンティング・フォーマット（pip install ruff）
+    if executable('ruff')
+        autocmd User lsp_setup call lsp#register_server({
+            \ 'name': 'ruff',
+            \ 'cmd': { server_info -> ['ruff', 'server'] },
+            \ 'allowlist': ['python'],
+            \})
+    endif
+    autocmd FileType python call s:configure_lsp()
 augroup END
 
 function! s:configure_lsp() abort
     setlocal omnifunc=lsp#complete
-    nnoremap <buffer> <C-]> :<C-u>LspDefinition<CR>
-    nnoremap <buffer> gd :<C-u>LspDefinition<CR>
+    nnoremap <buffer> <C-]> :<C-u>tab LspDefinition<CR>
+    nnoremap <buffer> gd :<C-u>tab LspDefinition<CR>
     nnoremap <buffer> gD :<C-u>LspReferences<CR>
     nnoremap <buffer> gs :<C-u>LspDocumentSymbol<CR>
     nnoremap <buffer> gS :<C-u>LspWorkspaceSymbol<CR>
